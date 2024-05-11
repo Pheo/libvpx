@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
   printf("Processed %d frames.\n", frame_cnt);
   if (vpx_codec_destroy(&codec)) die_codec(&codec, "Failed to destroy codec");
 
-  printf("Play: ffplay -f rawvideo -pix_fmt yuv420p -s %dx%d %s\n",
+  printf("Play: ffplay -f rawvideo -pixel_format yuv420p -video_size %dx%d %s\n",
          info->frame_width, info->frame_height, argv[2]);
 
   vpx_video_reader_close(reader);
