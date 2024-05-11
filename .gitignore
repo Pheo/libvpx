@@ -6,6 +6,7 @@
 *.gcno
 *.o
 *~
+.ccls-cache
 .cproject
 .idea
 .project

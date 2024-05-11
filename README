@@ -158,6 +158,12 @@ COMPILING THE APPLICATIONS/LIBRARIES:
   This defaults to config.log. This should give a good indication of what went
   wrong. If not, contact us for support.
 
+WASM Bitstream Analyzer:
+  To compile with docker:
+
+  $ docker build -t wasm_bitstream_analyzer .
+  $ docker run -it --rm -v .:/libvpx --name wasm_bitstream_analyzer wasm_bitstream_analyzer bash
+
 VP8/VP9 TEST VECTORS:
   The test vectors can be downloaded and verified using the build system after
   running configure. To specify an alternate directory the
