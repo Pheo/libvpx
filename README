@@ -160,9 +160,23 @@ COMPILING THE APPLICATIONS/LIBRARIES:
 
 WASM Bitstream Analyzer:
   To compile with docker:
+  TODO
 
+  To develop in docker:
   $ docker build -t wasm_bitstream_analyzer .
   $ docker run -it --rm -v .:/libvpx --name wasm_bitstream_analyzer wasm_bitstream_analyzer bash
+  To attaching to running container:
+  $ docker exec -it wasm_bitstream_analyzer bash
+
+  Generate compile_commands.json:
+  $ apt install bear
+  $ ./configure
+  $ bear -- make
+
+  Run analyzer:
+  $ make
+  $ cd examples
+  $ ./vp8_inspect ../samples/vp8.ivf out.vp8
 
 VP8/VP9 TEST VECTORS:
   The test vectors can be downloaded and verified using the build system after

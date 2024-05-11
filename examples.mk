@@ -243,6 +243,17 @@ vp8_multi_resolution_encoder.DESCRIPTION = VP8 Multiple-resolution Encoding
 endif
 endif
 
+EXAMPLES-$(CONFIG_DECODERS)     += vp8_inspect.c
+vp8_inspect.GUID                 = FA46A420-3356-441F-B0FD-60AA1345C182
+vp8_inspect.SRCS                += ivfdec.h ivfdec.c
+vp8_inspect.SRCS                += y4minput.c y4minput.h
+vp8_inspect.SRCS                += tools_common.h tools_common.c
+vp8_inspect.SRCS                += video_common.h
+vp8_inspect.SRCS                += video_reader.h video_reader.c
+vp8_inspect.SRCS                += vpx_ports/mem_ops.h
+vp8_inspect.SRCS                += vpx_ports/mem_ops_aligned.h
+vp8_inspect.DESCRIPTION          = outputs AOMAnalyzer-compatible JSON
+
 # Handle extra library flags depending on codec configuration
 
 # We should not link to math library (libm) on RVCT

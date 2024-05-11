@@ -6,11 +6,13 @@
 *.gcno
 *.o
 *~
+compile_commands.json
 .ccls-cache
 .cproject
 .idea
 .project
 .settings
+.vs
 .vscode
 /*-*.mk
 /*.asm
@@ -39,6 +41,7 @@
 /examples/simple_decoder
 /examples/simple_encoder
 /examples/twopass_encoder
+/examples/vp8_inspect
 /examples/vp8_multi_resolution_encoder
 /examples/vp8cx_set_ref
 /examples/vp9cx_set_ref
