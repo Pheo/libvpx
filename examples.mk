@@ -254,17 +254,17 @@ vp8_inspect.SRCS                += vpx_ports/mem_ops.h
 vp8_inspect.SRCS                += vpx_ports/mem_ops_aligned.h
 vp8_inspect.DESCRIPTION          = outputs AOMAnalyzer-compatible JSON
 
-EXAMPLES-$(CONFIG_DECODERS)        += vp9_inspect.c
-inspect.GUID                        = FA46A420-3356-441F-B0FD-60AA1345C181
-vp9_inspect.SRCS                   += ivfdec.h ivfdec.c
-vp9_inspect.SRCS                   += args.c args.h
-vp9_inspect.SRCS                   += tools_common.h tools_common.c
-vp9_inspect.SRCS                   += video_common.h
-vp9_inspect.SRCS                   += video_reader.h video_reader.c
-vp9_inspect.SRCS                   += vpx_ports/mem_ops.h
-vp9_inspect.SRCS                   += vpx_ports/mem_ops_aligned.h
-vp9_inspect.SRCS                   += vpx_ports/msvc.h
-vp9_inspect.DESCRIPTION             = Dump inspection data
+#EXAMPLES-$(CONFIG_DECODERS)        += vp9_inspect.c
+#inspect.GUID                        = FA46A420-3356-441F-B0FD-60AA1345C181
+#vp9_inspect.SRCS                   += ivfdec.h ivfdec.c
+#vp9_inspect.SRCS                   += args.c args.h
+#vp9_inspect.SRCS                   += tools_common.h tools_common.c
+#vp9_inspect.SRCS                   += video_common.h
+#vp9_inspect.SRCS                   += video_reader.h video_reader.c
+#vp9_inspect.SRCS                   += vpx_ports/mem_ops.h
+#vp9_inspect.SRCS                   += vpx_ports/mem_ops_aligned.h
+#vp9_inspect.SRCS                   += vpx_ports/msvc.h
+#vp9_inspect.DESCRIPTION             = Dump inspection data
 
 # Handle extra library flags depending on codec configuration
 

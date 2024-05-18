@@ -168,15 +168,16 @@ WASM Bitstream Analyzer:
   To attaching to running container:
   $ docker exec -it wasm_bitstream_analyzer bash
 
-  Generate compile_commands.json:
-  $ apt install bear
-  $ ./configure
-  $ bear -- make
-
   Run analyzer:
   $ make
   $ cd examples
-  $ ./vp8_inspect ../samples/vp8.ivf out.vp8
+  $ ./examples/vp8_inspect ./samples/vp8.ivf
+
+  Tooling + Debug:
+  $ apt install bear
+  $ ./configure --enable-debug-libs
+  $ bear -- make
+  $ gdb --args ./examples/vp8_inspect ./samples/vp8.ivf
 
 VP8/VP9 TEST VECTORS:
   The test vectors can be downloaded and verified using the build system after

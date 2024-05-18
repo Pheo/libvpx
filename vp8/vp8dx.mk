@@ -36,4 +36,8 @@ VP8_DX_SRCS-yes += decoder/treereader.h
 VP8_DX_SRCS-yes += decoder/onyxd_if.c
 VP8_DX_SRCS-$(CONFIG_MULTITHREAD) += decoder/threading.c
 
+# TODO: CONFIG_INSPECTION
+VP8_DX_SRCS-yes += decoder/inspection.c
+VP8_DX_SRCS-yes += decoder/inspection.h
+
 VP8_DX_SRCS-yes := $(filter-out $(VP8_DX_SRCS_REMOVE-yes),$(VP8_DX_SRCS-yes))
