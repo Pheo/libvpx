@@ -180,8 +180,8 @@ WASM Bitstream Analyzer:
   $ gdb --args ./examples/vp8_inspect ./samples/vp8.ivf
 
   Wasm Build
-  $ emconfigure ../libvpx/configure --disable-multithread --disable-runtime-cpu-detect --target=generic-gnu --disable-docs --disable-unit-tests --enable-debug --extra-cflags='-g'
-  $ emmake make -j8
+  $ emconfigure ../libvpx/configure --target=generic-gnu --enable-vp9-highbitdepth --disable-multithread --disable-runtime-cpu-detect --disable-docs --disable-unit-tests
+  $ emmake make -j8 EMCC_CFLAGS="-s ENVIRONMENT=web -s MODULARIZE=1 -s EXPORT_ES6=1 -s USE_ES6_IMPORT_META=0"
 
   Wasm Debug
   $ curl https://wasmtime.dev/install.sh -sSf | bash

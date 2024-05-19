@@ -16,13 +16,19 @@
 #include "../vp8/decoder/inspection.h"
 #include "../vpx_mem/vpx_mem.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#else
+#define EMSCRIPTEN_KEEPALIVE
+#endif
+
 // Max JSON buffer size // TODO: identify if there are any cases where this is insufficient?
 const int MAX_BUFFER = 1024 * 1024 * 32;
 
 static const char *exec_name;
 
 void usage_exit(void) {
-  fprintf(stderr, "Usage: %s <ivf>\n", exec_name);
+  fprintf(stderr, "Usage: %s ivf_file\n", exec_name);
   exit(EXIT_FAILURE);
 }
 
@@ -52,6 +58,7 @@ VpxVideoReader *reader = NULL;
 const VpxInterface *decoder = NULL;
 const VpxVideoInfo *info = NULL;
 
+EMSCRIPTEN_KEEPALIVE
 int open_file(char *file) {
   if (file == NULL) {
     // TODO: default behaviour
@@ -91,6 +98,7 @@ size_t frame_size = 0;
 int have_frame = 0;
 
 // TODO: make single read_frame()?
+EMSCRIPTEN_KEEPALIVE
 void read_frames() {
   // TODO: skip .show_existing frames as they are no-op?
   // NOTE: actually, maybe we shouldn't skip, and send back to analyzer. We can hide/collapse client side with a flag
@@ -136,16 +144,17 @@ int inspect() {
   return 1;
 }
 
+EMSCRIPTEN_KEEPALIVE
 void quit() {
   if (vpx_codec_destroy(&codec)) die_codec(&codec, "Failed to destroy codec");
   vpx_video_reader_close(reader);
 }
 
+EMSCRIPTEN_KEEPALIVE
 int main(int argc, char **argv) {
   exec_name = argv[0];
   if (argc <= 1) {
     usage_exit();
-    return EXIT_FAILURE;
   }
 
   open_file(argv[1]);
@@ -156,6 +165,4 @@ int main(int argc, char **argv) {
   printf("]");
 
   quit(); // NOTE: This should be called externally (ie. EMSCRIPTEN_KEEPALIVE)
-
-  return EXIT_SUCCESS;
 }
