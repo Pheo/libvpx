@@ -11,7 +11,7 @@
 #include "../tools_common.h"
 #include "../video_common.h"; // VpxVideoInfo
 #include "../video_reader.h"
-#include "../vpx_config.h"
+#include "vpx_config.h"
 
 #include "../vp8/decoder/inspection.h"
 #include "../vpx_mem/vpx_mem.h"
@@ -81,6 +81,9 @@ int open_file(char *file) {
 /*********************/
 /*    inspection     */
 /*********************/
+// TODO: declare at top?
+int inspect();
+void on_frame_decoded_dump(char *json);
 
 const unsigned char *frame;
 const unsigned char *end_frame;
@@ -90,6 +93,7 @@ int have_frame = 0;
 // TODO: make single read_frame()?
 void read_frames() {
   // TODO: skip .show_existing frames as they are no-op?
+  // NOTE: actually, maybe we shouldn't skip, and send back to analyzer. We can hide/collapse client side with a flag
   while (vpx_video_reader_read_frame(reader)) {
     vpx_codec_iter_t iter = NULL;
     vpx_image_t *img = NULL;

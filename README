@@ -175,9 +175,17 @@ WASM Bitstream Analyzer:
 
   Tooling + Debug:
   $ apt install bear
-  $ ./configure --enable-debug-libs
+  $ ./configure --enable-debug-libs --enable-debug --extra-cflags='-g'
   $ bear -- make
   $ gdb --args ./examples/vp8_inspect ./samples/vp8.ivf
+
+  Wasm Build
+  $ emconfigure ../libvpx/configure --disable-multithread --disable-runtime-cpu-detect --target=generic-gnu --disable-docs --disable-unit-tests --enable-debug --extra-cflags='-g'
+  $ emmake make -j8
+
+  Wasm Debug
+  $ curl https://wasmtime.dev/install.sh -sSf | bash
+  $ wasmtime
 
 VP8/VP9 TEST VECTORS:
   The test vectors can be downloaded and verified using the build system after
