@@ -175,7 +175,7 @@ WASM Bitstream Analyzer:
 
   Tooling + Debug:
   $ apt install bear
-  $ ./configure --enable-debug-libs --enable-debug --extra-cflags='-g'
+  $ ./configure --enable-debug-libs --enable-debug --extra-cflags='-g -O0'
   $ bear -- make
   $ gdb --args ./examples/vp8_inspect ./samples/vp8.ivf
 
