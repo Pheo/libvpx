@@ -27,6 +27,51 @@ const int MAX_BUFFER = 1024 * 1024 * 32;
 
 static const char *exec_name;
 
+/****************************/
+/* AV1 inspect.c signatures */
+/****************************/
+/*
+int open_file(char *file);
+int read_frame(void);
+const char *get_aom_codec_build_config(void);
+int get_bit_depth(void);
+int get_bits_per_sample(void);
+int get_image_format(void);
+unsigned char *get_plane(int plane);
+int get_plane_stride(int plane);
+int get_plane_width(int plane);
+int get_plane_height(int plane);
+int get_frame_width(void);
+int get_Frame_height(void);
+int main(int argc, char **argv);
+void quit(void);
+void set_layers(LayerType v);
+void set_compress(int v);
+*/
+
+/****************************/
+/* vp9_inspect.c signatures */
+/****************************/
+/*
+int open_file(char *file);
+int read_frame();
+const char *get_codec_build_config();
+int get_bit_depth();
+int get_bits_per_sample();
+int get_image_format();
+unsigned char *get_plane(int plane);
+int get_plane_stride(int plane);
+int get_plane_width(int plane);
+int get_plane_height(int plane);
+int get_frame_width();
+int get_frame_height();
+int main(int argc, char **argv);
+void read_frames();
+void quit();
+void set_layers(LayerType v);
+void set_compress(int v);
+*/
+
 void usage_exit(void) {
   fprintf(stderr, "Usage: %s ivf_file\n", exec_name);
   exit(EXIT_FAILURE);
@@ -58,6 +103,8 @@ VpxVideoReader *reader = NULL;
 const VpxInterface *decoder = NULL;
 const VpxVideoInfo *info = NULL;
 
+// NOTE: in worker.ts, native.FS.writeFile('/tmp/input.ivf', buffer, { encoding: 'binary' } writes to somewhere..
+// before native._open_file() works on it!
 EMSCRIPTEN_KEEPALIVE
 int open_file(char *file) {
   if (file == NULL) {
@@ -150,6 +197,9 @@ void quit() {
   vpx_video_reader_close(reader);
 }
 
+// NOTE: I think main is only useful for development. Not used from wasm
+// NOTE2: I think what I need to do is to design vp8_inspect.c so it maintains state, and gets called..
+// NOTE3: I don't quite understand what is the need to limit frames (is it just a UI/UX thing?)
 EMSCRIPTEN_KEEPALIVE
 int main(int argc, char **argv) {
   exec_name = argv[0];
