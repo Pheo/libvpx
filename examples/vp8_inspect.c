@@ -101,7 +101,7 @@ int decoded_frame_count = 0;
 vpx_codec_ctx_t codec;
 VpxVideoReader *reader = NULL;
 const VpxInterface *decoder = NULL;
-const VpxVideoInfo *info = NULL;
+const VpxVideoInfo *info = NULL; // note used by get_frame_width, get_frame_height
 
 // NOTE: in worker.ts, native.FS.writeFile('/tmp/input.ivf', buffer, { encoding: 'binary' } writes to somewhere..
 // before native._open_file() works on it!
@@ -144,33 +144,12 @@ const unsigned char *end_frame;
 size_t frame_size = 0;
 int have_frame = 0;
 
-// TODO: make single read_frame()?
-EMSCRIPTEN_KEEPALIVE
-void read_frames() {
-  // TODO: skip .show_existing frames as they are no-op?
-  // NOTE: actually, maybe we shouldn't skip, and send back to analyzer. We can hide/collapse client side with a flag
-  while (vpx_video_reader_read_frame(reader)) {
-    vpx_codec_iter_t iter = NULL;
-    vpx_image_t *img = NULL;
-
-    frame = vpx_video_reader_get_frame(reader, &frame_size);
-    if (vpx_codec_decode(&codec, frame, (unsigned int)frame_size, NULL, 0))
-      die_codec(&codec, "Failed to decode frame.");
-
-    while ((img = vpx_codec_get_frame(&codec, &iter)) != NULL) {
-      // vpx_img_write(img, outfile);
-      // TODO: note that frame_data here is global..
-      inspect();
-      ++frame_count;
-    }
-  }
-}
-
 void on_frame_decoded_dump(char *json) {
   // TODO: EM_ASM_({ Module.on_frame_decoded_json($0); }, json);
   printf("%s", json);
 }
 
+// NOTE: i think for vp8 & vp9, we should be able to skip ifd_init_cb
 // TODO: pass frame_data + decoder as args instead of pulling from global
 int inspect() {
   // fetch frame data (global)
@@ -197,9 +176,66 @@ void quit() {
   vpx_video_reader_close(reader);
 }
 
-// NOTE: I think main is only useful for development. Not used from wasm
-// NOTE2: I think what I need to do is to design vp8_inspect.c so it maintains state, and gets called..
-// NOTE3: I don't quite understand what is the need to limit frames (is it just a UI/UX thing?)
+vpx_image_t *img = NULL; // TODO: so this is the big state?
+// TODO: make single read_frame()? get rid of read_frames
+EMSCRIPTEN_KEEPALIVE
+int read_frame() {
+  // TODO: shouldn't we make frame_size scoped in here???
+  // NOTE: vp8 doesn't have show_existing_frame, but in case of VP9/AV1, we might want to not skip, and let client collapse
+  if (!vpx_video_reader_read_frame(reader)) return EXIT_FAILURE;
+  frame = vpx_video_reader_get_frame(reader, &frame_size);
+
+  if (vpx_codec_decode(&codec, frame, (unsigned int)frame_size, NULL, 0))
+    die_codec(&codec, "Failed to decode frame."); // TODO: check if this die_codec aborts?
+
+  vpx_codec_iter_t iter = NULL;
+
+  // TODO: why does vp9_inspect.c use vpx_codec_control instead of vpx_codec_get_frame?
+  // NOTE: vpx_codec_get_frame can return multiple frames, but not in vp8 right? i assume this is for superframes
+  int frames_read = 0;
+  while ((img = vpx_codec_get_frame(&codec, &iter)) != NULL) {
+    // TODO: note that frame_data here is global..
+    // TODO: implement inspect();, must have passed to frame_data?
+    ++frames_read;
+  }
+
+  if (frames_read != 1) {
+    fprintf(stderr, "expected exactly 1 frame? but found %d\n", frames_read);
+    return EXIT_FAILURE;
+  }
+
+  frame_count += frames_read; // will only be +=1
+  return EXIT_SUCCESS;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int get_bit_depth() { return img->bit_depth; }
+
+EMSCRIPTEN_KEEPALIVE
+int get_bits_per_sample() { return img->bps; }
+
+EMSCRIPTEN_KEEPALIVE
+int get_image_format() { return img->fmt; }
+
+EMSCRIPTEN_KEEPALIVE
+unsigned char *get_plane(int plane) { return img->planes[plane]; }
+
+EMSCRIPTEN_KEEPALIVE
+int get_plane_stride(int plane) { return img->stride[plane]; }
+
+EMSCRIPTEN_KEEPALIVE
+int get_plane_width(int plane) { return vpx_img_plane_width(img, plane); }
+
+EMSCRIPTEN_KEEPALIVE
+int get_plane_height(int plane) { return vpx_img_plane_height(img, plane); }
+
+EMSCRIPTEN_KEEPALIVE
+int get_frame_width() { return info->frame_width; }
+
+EMSCRIPTEN_KEEPALIVE
+int get_frame_height() { return info->frame_height; }
+
+// Main currently use for development. Keep in mind that inspector is stateful, and driven from aomanalyzer
 EMSCRIPTEN_KEEPALIVE
 int main(int argc, char **argv) {
   exec_name = argv[0];
