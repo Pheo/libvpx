@@ -170,19 +170,12 @@ int inspect() {
   return 1;
 }
 
-EMSCRIPTEN_KEEPALIVE
-void quit() {
-  if (vpx_codec_destroy(&codec)) die_codec(&codec, "Failed to destroy codec");
-  vpx_video_reader_close(reader);
-}
-
 vpx_image_t *img = NULL; // TODO: so this is the big state?
-// TODO: make single read_frame()? get rid of read_frames
 EMSCRIPTEN_KEEPALIVE
 int read_frame() {
   // TODO: shouldn't we make frame_size scoped in here???
   // NOTE: vp8 doesn't have show_existing_frame, but in case of VP9/AV1, we might want to not skip, and let client collapse
-  if (!vpx_video_reader_read_frame(reader)) return EXIT_FAILURE;
+  if (!vpx_video_reader_read_frame(reader)) return EXIT_FAILURE; // end?
   frame = vpx_video_reader_get_frame(reader, &frame_size);
 
   if (vpx_codec_decode(&codec, frame, (unsigned int)frame_size, NULL, 0))
@@ -235,6 +228,12 @@ int get_frame_width() { return info->frame_width; }
 EMSCRIPTEN_KEEPALIVE
 int get_frame_height() { return info->frame_height; }
 
+EMSCRIPTEN_KEEPALIVE
+void quit() {
+  if (vpx_codec_destroy(&codec)) die_codec(&codec, "Failed to destroy codec");
+  vpx_video_reader_close(reader);
+}
+
 // Main currently use for development. Keep in mind that inspector is stateful, and driven from aomanalyzer
 EMSCRIPTEN_KEEPALIVE
 int main(int argc, char **argv) {
@@ -243,12 +242,25 @@ int main(int argc, char **argv) {
     usage_exit();
   }
 
+  // STEP 1: open .ivf, initializes frame_data
   open_file(argv[1]);
+
   printf("[\n");
-  read_frames();
+
+  // STEP 2: read frame, should be only 1 per call in vp8?
+  while (!read_frame()) {
+    // STEP 3: inspect frame, prints out JSON
+    // inspect() // TODO
+
+    // STEP 4: scan img->planes, returns vpx_image
+    // get_plane(42) TODO
+  }
 
   printf("null\n");
   printf("]");
 
   quit(); // NOTE: This should be called externally (ie. EMSCRIPTEN_KEEPALIVE)
 }
+
+// void set_layers(LayerType v) { layers = v; } // TODO
+// void set_compress(int v) { compress = v; }
