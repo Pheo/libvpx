@@ -172,7 +172,7 @@ int inspect() {
 
 vpx_image_t *img = NULL; // TODO: so this is the big state?
 EMSCRIPTEN_KEEPALIVE
-int read_frame() {
+int step_frame() {
   // TODO: shouldn't we make frame_size scoped in here???
   // NOTE: vp8 doesn't have show_existing_frame, but in case of VP9/AV1, we might want to not skip, and let client collapse
   if (!vpx_video_reader_read_frame(reader)) return EXIT_FAILURE; // end?
@@ -248,7 +248,7 @@ int main(int argc, char **argv) {
   printf("[\n");
 
   // STEP 2: read frame, should be only 1 per call in vp8?
-  while (!read_frame()) {
+  while (!step_frame()) {
     // STEP 3: inspect frame, prints out JSON
     // inspect() // TODO
 
